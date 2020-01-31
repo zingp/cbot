@@ -1,0 +1,2 @@
+# cbot
+auto comments
