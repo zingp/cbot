@@ -75,9 +75,9 @@ class CommentDecoder(nn.Module):
         self.layers = nn.ModuleList([DecoderBlock(d_model, d_ff, n_head, dropout) for _ in range(n_block)])
         self.norm = LayerNorm(d_model)
 
-    def forward(self, x, m1, m2, mask):
+    def forward(self, x, m, mask):
         for layer in self.layers:
-            x = layer(x, m1, m2, mask)
+            x = layer(x, m, mask)
         return self.norm(x)
 
 
@@ -293,7 +293,7 @@ class Model(nn.Module):
         out_text = out_text.repeat(nums, 1, 1)
 
         mask = Variable(subsequent_mask(Y.size(0), Y.size(1) - 1), requires_grad=False).cuda()
-        outs = self.decode(Y[:, :-1], out_text, out_text, mask)
+        outs = self.decode(Y[:, :-1], out_text, mask)
 
         Y = Y.t()
         outs = outs.transpose(0, 1)

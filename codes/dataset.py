@@ -46,7 +46,7 @@ class DataSet(torch.utils.data.Dataset):
             comment = data['comment'][0]
         else:
             comment = data['comment']
-        Y = DataSet.padding(comment, self.opt.max_len)
+        Y = self.padding(comment, self.opt.max_len)
 
         return Y, T
 
@@ -54,17 +54,16 @@ class DataSet(torch.utils.data.Dataset):
         data = self.datas[index]
         T = self.load_comments(data['context'])
 
-        Y = [DataSet.padding(c, self.opt.max_len) for c in data['candidate']]
+        Y = [self.padding(c, self.opt.max_len) for c in data['candidate']]
         return torch.stack(Y), T, data
 
 
     def load_comments(self, context):
-        if opt.n_com == 0:
+        if self.opt.n_com == 0:
             return torch.LongTensor([1]+[0]*self.opt.max_len*5+[2])
-        return DataSet.padding(context, self.opt.max_len*self.opt.n_com)
+        return self.padding(context, self.opt.max_len*self.opt.n_com)
 
-    @staticmethod
-    def padding(data, max_len):
+    def padding(self, data, max_len):
         data = data.split()
         if len(data) > max_len-2:
             data = data[:max_len-2]
@@ -74,8 +73,7 @@ class DataSet(torch.utils.data.Dataset):
         Y = torch.cat([torch.LongTensor(Y), torch.zeros(max_len - length).long()])
         return Y
 
-    @staticmethod
-    def transform_to_words(ids):
+    def transform_to_words(self, ids):
         words = []
         for id in ids:
             if id == 2:
