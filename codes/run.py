@@ -108,14 +108,12 @@ def eval(model, dev_set, batch_size):
     dev_batch = get_dataloader(dev_set, batch_size, is_train=False)
 
     loss = 0
-    
     with torch.no_grad():
         for batch in dev_batch:
             Y, T = batch
             Y = Y.to(device)
             T = T.to(device)
             loss += model(Y, T).item()
-
     print(loss)
     print("evaluting time:", time.time() - start_time)
 
@@ -152,18 +150,16 @@ def test(test_set, model):
     print(s.format(recall_1, recall_5, recall_10, mr, mrr))
 
     print("testing time:", time.time() - start_time)
-    for ref, pre in zip(references, predictions):
-        print(ref)
-        print("-"*20)  
-        print(pre)
-        print("*"*100)
+    # for ref, pre in zip(references, predictions):
+    #     print(ref)
+    #     print("-"*20)  
+    #     print(pre)
+    #     print("*"*100)
         
-
 
 if __name__ == '__main__':
     args = set_parser()
     config = Config(args)
-
     if args.mode == 'train':
         train(config)
     else:
