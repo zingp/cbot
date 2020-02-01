@@ -6,8 +6,6 @@
 '''
 定义模型主体结构
 '''
-
-
 import math
 import copy
 import numpy as np
@@ -18,31 +16,7 @@ import torch.utils.data
 import torch.nn.functional as F
 from torch.autograd import Variable
 
-
-BOS = 1
 device = torch.device("cuda" if torch.cuda.is_available() else "gpu")
-
-
-# class luong_attention(nn.Module):
-
-#     def __init__(self, hidden_size):
-#         super(luong_attention, self).__init__()
-#         self.hidden_size = hidden_size
-#         self.linear_in = nn.Linear(hidden_size, hidden_size)
-#         self.linear_out = nn.Sequential(nn.Linear(2*hidden_size, hidden_size), nn.Tanh())
-#         self.softmax = nn.Softmax(dim=-1)
-
-#     def init_context(self, context):
-#         self.context = context  # batch * seq1 * size
-
-#     def forward(self, h): # batch * seq2 * size
-#         gamma_h = self.linear_in(h)   #    batch * seq2 * size
-#         weights = torch.bmm(gamma_h, self.context.transpose(1,2))   #  batch * seq2 * seq1
-#         weights = self.softmax(weights)   #   batch * seq2 * seq1
-#         c_t = torch.bmm(weights, self.context) # batch * seq2 * size
-#         output = self.linear_out(torch.cat([c_t, h], -1)) # batch * seq2 * size
-
-#         return output
 
 
 class Generator(nn.Module):
@@ -247,7 +221,6 @@ def subsequent_mask(batch, size):
     return torch.from_numpy(subsequent_mask) == 0
 
 
-
 class Model(nn.Module):
     def __init__(self, n_emb, n_hidden, vocab_size, dropout, d_ff, n_head, n_block):
         super(Model, self).__init__()
@@ -271,21 +244,16 @@ class Model(nn.Module):
         out = self.comment_decoder(embs, T, mask)
         out = self.output_layer(out)
         return out
-
     
     def forward(self, Y, T):
         enc_text = self.encode_text(T)
         mask = Variable(subsequent_mask(Y.size(0), Y.size(1)-1), requires_grad=False).cuda()
         outs = self.decode(Y[:,:-1], enc_text, mask)
-
         Y = Y.t()
         outs = outs.transpose(0, 1)
-
         loss = self.criterion(outs.contiguous().view(-1, self.vocab_size),
                               Y[1:].contiguous().view(-1))
-
         return torch.mean(loss)
-
 
     def ranking(self, Y, T):
         nums = len(Y)

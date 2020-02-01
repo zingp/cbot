@@ -20,6 +20,7 @@ def dump_to_json(datas, fout):
         fout.write('\n')
     fout.close()
 
+
 class DataSet(torch.utils.data.Dataset):
 
     def __init__(self, data_path, vocabs, config, is_train=True):

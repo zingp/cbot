@@ -3,7 +3,7 @@ import time
 import json
 import argparse
 import torch
-import torch.optim as Optim
+import torch.optim as optim
 
 from models import Model
 from models import save_model
@@ -66,7 +66,7 @@ def train(config):
         model_dict = torch.load(args.restore)
         model.load_state_dict(model_dict)
     model.to(device)
-    optim = Optim.Adam(filter(lambda p: p.requires_grad,model.parameters()), lr=args.lr)
+    optimizer = optim.Adam(filter(lambda p: p.requires_grad,model.parameters()), lr=args.lr)
     best_score = -1000000
 
     for i in range(args.epoch):
@@ -74,13 +74,13 @@ def train(config):
         report_loss, start_time, n_samples = 0, time.time(), 0
         count, total = 0, len(train_set) // args.batch_size + 1
         for batch in train_batch:
-            model.zero_grad()
             Y, T = batch
             Y = Y.to(device)
             T = T.to(device)
+            optimizer.zero_grad()
             loss = model(Y, T)
             loss.backward()
-            optim.step()
+            optimizer.step()
             report_loss += loss.item()
             #break
             n_samples += len(Y.data)
