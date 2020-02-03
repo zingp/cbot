@@ -127,7 +127,7 @@ def test(test_set, model):
     predictions, references = [], []
     with torch.no_grad():
         for i in range(len(test_set)):
-            Y, T, data = test_set.get_and_candidate(i)
+            Y, T, data = test_set.get_candidate(i)
             Y = Y.to(device)
             T = T.to(device)
             ids = model.ranking(Y, T).data
